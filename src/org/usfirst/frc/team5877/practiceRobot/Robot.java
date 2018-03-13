@@ -52,7 +52,7 @@ public class Robot extends IterativeRobot {
 		//left.get()
 //		fSpeed += ((-playerOne.getY(Hand.kLeft) - left.get())/8);
 //		tSpeed += (playerOne.getX(Hand.kRight) - left.get())/8;
-		System.out.println(playerOne.getY(Hand.kLeft));
+//		System.out.println(playerOne.getY(Hand.kLeft));
 		if(-playerOne.getY(Hand.kLeft) >= deadZone || -playerOne.getY(Hand.kLeft) <= -deadZone || playerOne.getX(Hand.kRight) >= deadZone || playerOne.getX(Hand.kRight) <= -deadZone)
 			m_myRobot.arcadeDrive(-playerOne.getY(Hand.kLeft), playerOne.getX(Hand.kRight));
 		
