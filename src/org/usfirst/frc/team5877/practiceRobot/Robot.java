@@ -21,30 +21,26 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
  * it contains the code necessary to operate a robot with tank drive.
  */
 public class Robot extends IterativeRobot {
-	private Spark arm;
+	private Spark arm, roller1, roller2;
 	private SpeedControllerGroup left, right;
 	private DifferentialDrive m_myRobot;
 	private XboxController playerOne, playerTwo;
 	private double output = 0;
-	private Solenoid clawOpen, clawClose, liftUp, liftDown;
-	private double fSpeed = 0, tSpeed = 0, deadZone = 0.05;
+	private Solenoid liftUp, liftDown;
+	private double deadZone = 0.05;
 
 	@Override
 	public void robotInit() {
 		playerOne = new XboxController(0);
 		playerTwo = new XboxController(1);
 		arm = new Spark(4);
+		roller1 = new Spark(5);
+		roller2 = new Spark(6);
 		left = new SpeedControllerGroup(new Victor(0), new Victor(2));
 		right = new SpeedControllerGroup(new Victor(1), new Victor(3));
 		m_myRobot = new DifferentialDrive(left, right);
-		
-		clawOpen = new Solenoid(6, 0);
-		clawClose = new Solenoid(6, 1);
-		liftUp = new Solenoid(6, 2);
-		liftDown = new Solenoid(6, 3);
-		
-		clawOpen.set(true);
-		clawClose.set(false);
+		liftUp = new Solenoid(6, 0);
+		liftDown = new Solenoid(6, 1);
 	}
 
 	@Override
@@ -64,35 +60,34 @@ public class Robot extends IterativeRobot {
 			arm.set(output);
 		}
 		
-		if(playerTwo.getAButton() && false) {
+		if(playerTwo.getAButton()) {
 			liftUp.set(true);
 			liftDown.set(false);
-		} else if(playerTwo.getYButton() && false){
+		} else if(playerTwo.getYButton()){
 			liftUp.set(false);
 			liftUp.set(true);
 		}
 		
-		if(playerTwo.getBumperReleased(Hand.kRight)) {
-			clawOpen.set(true);
-			clawClose.set(false);
-		} else if(playerTwo.getBumperReleased(Hand.kLeft)){
-			clawOpen.set(false);
-			clawClose.set(true);
+		if(playerTwo.getBumper(Hand.kRight)) {
+			roller1.set(1);
+			roller2.set(-1);
+		} else if(playerTwo.getBumper(Hand.kLeft)){
+			roller1.set(-1);
+			roller2.set(1);
+		} else {
+			roller1.set(0);
+			roller2.set(0);
 		}
+		
 	}
 
 	@Override
 	public void autonomousInit() {
-		clawOpen = new Solenoid(6, 0);
-		clawClose = new Solenoid(6, 1);
 		
-		clawOpen.set(true);
-		clawClose.set(false);
 	}
 	
 	@Override
 	public void autonomousPeriodic() { 
-		clawClose.set(true);
-		clawOpen.set(false);
+	
 	}
 }
