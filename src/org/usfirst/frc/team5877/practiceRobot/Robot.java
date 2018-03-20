@@ -7,8 +7,11 @@
 
 package org.usfirst.frc.team5877.practiceRobot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -25,22 +28,28 @@ public class Robot extends IterativeRobot {
 	private SpeedControllerGroup left, right;
 	private DifferentialDrive m_myRobot;
 	private XboxController playerOne, playerTwo;
+//	private Joystick playerThree;
 	private double output = 0;
-	private Solenoid liftUp, liftDown;
+//	private Solenoid liftUp, liftDown;
 	private double deadZone = 0.05;
+	private UsbCamera camera;
 
 	@Override
 	public void robotInit() {
 		playerOne = new XboxController(0);
 		playerTwo = new XboxController(1);
+//		playerThree = new Joystick(1);
 		arm = new Spark(4);
 		roller1 = new Spark(5);
 		roller2 = new Spark(6);
 		left = new SpeedControllerGroup(new Victor(0), new Victor(2));
 		right = new SpeedControllerGroup(new Victor(1), new Victor(3));
 		m_myRobot = new DifferentialDrive(left, right);
-		liftUp = new Solenoid(6, 0);
-		liftDown = new Solenoid(6, 1);
+//		liftUp = new Solenoid(6, 0);
+//		liftDown = new Solenoid(6, 1);
+		
+		camera = CameraServer.getInstance().startAutomaticCapture();
+		
 	}
 
 	@Override
@@ -51,33 +60,43 @@ public class Robot extends IterativeRobot {
 //		System.out.println(playerOne.getY(Hand.kLeft));
 		if(-playerOne.getY(Hand.kLeft) >= deadZone || -playerOne.getY(Hand.kLeft) <= -deadZone || playerOne.getX(Hand.kRight) >= deadZone || playerOne.getX(Hand.kRight) <= -deadZone)
 			m_myRobot.arcadeDrive(-playerOne.getY(Hand.kLeft), playerOne.getX(Hand.kRight));
+//			m_myRobot.arcadeDrive(-playerThree.getY(), playerThree.getX());
 		
 		if(playerTwo.getBButton()) {
-			output += (((playerTwo.getY(Hand.kLeft)*.75) - arm.get()) / 8);
-			arm.set(output);
+			output += (((-playerTwo.getY(Hand.kLeft)*.75) - arm.get()) / 8);
 		} else {
-			output += (((playerTwo.getY(Hand.kLeft)*.35) - arm.get()) / 8);
-			arm.set(output);
+			output += (((-playerTwo.getY(Hand.kLeft)*.35) - arm.get()) / 8);
 		}
+		arm.set(output);
 		
-		if(playerTwo.getAButton()) {
-			liftUp.set(true);
-			liftDown.set(false);
-		} else if(playerTwo.getYButton()){
-			liftUp.set(false);
-			liftUp.set(true);
-		}
+//		if(playerTwo.getAButton()) {
+//			liftUp.set(true);
+//			liftDown.set(false);
+//		} else if(playerTwo.getYButton()){
+//			liftUp.set(false);
+//			liftUp.set(true);
+//		}
 		
 		if(playerTwo.getBumper(Hand.kRight)) {
-			roller1.set(1);
-			roller2.set(-1);
+			roller1.set(0.75);
+			roller2.set(-0.75);
 		} else if(playerTwo.getBumper(Hand.kLeft)){
-			roller1.set(-1);
-			roller2.set(1);
-		} else {
+			roller1.set(-0.50);
+			roller2.set(50);
+		} else if(playerTwo.getTriggerAxis(Hand.kRight) > 0.5) {
+			roller1.set(0.75);
+			roller2.set(0.50);
+		} else if(playerTwo.getTriggerAxis(Hand.kLeft) > 0.5) {
+			roller1.set(-0.50);
+			roller2.set(-0.75);
+		} else if(playerTwo.getAButton()){
+			roller1.set(-0.25);
+			roller2.set(0.25);
+		}  else {
 			roller1.set(0);
 			roller2.set(0);
 		}
+		
 		
 	}
 
